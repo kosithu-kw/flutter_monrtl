@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
+import 'package:monrtl/main.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'contact.dart';
 
@@ -103,10 +104,19 @@ class RTeams extends StatelessWidget {
               );
 
             }else if(s.hasError) {
-              return Text("${s.error}");
-              // return Center(
-              //  child: CircularProgressIndicator(),
-              //);
+              return Center(
+                  child: TextButton(
+                    onPressed: (){
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (BuildContext context) => new MainApp()));
+                    },
+                    child: Text("အင်တာနက်ဆက်သွယ်မှုများကိုစစ်ဆေးပြီးပြန်လည်ကြိုးစားကြည့်ပါ",
+                      style: TextStyle(color: Colors.orange),
+                    ),
+                  )
+              );
             }
             else{
               return Center(

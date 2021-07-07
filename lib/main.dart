@@ -1,114 +1,85 @@
-
-import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'home.dart';
 
+void main(){
+  runApp(
+    MaterialApp(
+      title: 'Named Routes Demo',
+      // Start the app with the "/" named route. In this case, the app starts
+      // on the FirstScreen widget.
+      initialRoute: '/',
+      routes: {
+        // When navigating to the "/" route, build the FirstScreen widget.
+        '/': (context) => MainApp(),
+        // When navigating to the "/second" route, build the SecondScreen widget.
+        '/home': (context) => HomeApp(),
+      },
+    ),
+  );
+}
 
-import 'RTeams.dart';
-
-void main()=>runApp(App());
-
-
-
-
-class App extends StatefulWidget {
-  const App({Key? key}) : super(key: key);
+class MainApp extends StatefulWidget {
+  const MainApp({Key? key}) : super(key: key);
 
   @override
   _AppState createState() => _AppState();
 }
 
-class _AppState extends State<App> {
-  
-  getData() async{
+class _AppState extends State<MainApp> {
+
+  final String _title="MON RTL";
+
+  final String _mTitle="မွန်ပြည်နယ်";
+  final String _subTitle="(၁၀) မြို့နယ်အတွင်းရှိ အရေးပေါ်ကယ်ဆယ်ရေးအဖွဲ့များ";
+
+  bool _isConnection=false;
+
+
+   checkConnection() async{
     var res=await http.get(Uri.https('raw.githubusercontent.com', "kosithu-kw/flutter_mrtl_data/master/townships.json"));
-    var jsonData=jsonDecode(res.body);
-    return jsonData;
+    if(res.statusCode==200){
+     setState(() {
+       Navigator.pushNamed(context, '/home');
+     });
+
+
+
+    }
+    //print(res.statusCode);
   }
 
-  final String _title="မွန်ပြည်နယ်";
-  final String _subTitle="(၁၀) မြို့နယ်အတွင်းရှိ အရေးပေါ်ကယ်ဆယ်ရေးအဖွဲ့များ";
-  final String _bSubtitle="မြို့နယ်အတွင်းရှိ အရေးပေါ်ကယ်ဆယ်ရေးအဖွဲ့များ";
+  @override
+  void initState() {
+    // TODO: implement initState
+    checkConnection();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
         title: _title,
         home: Scaffold(
-          appBar: AppBar(
+          body: Container(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(_mTitle, style: TextStyle(color: Colors.blueAccent, fontSize: 30),),
+                  Text(_subTitle),
 
-            title: Text(_title,
-              style: TextStyle(
-                  color: Colors.blueAccent
-
+                  SizedBox(height: 100,),
+                  Container(
+                    child: CircularProgressIndicator(),
+                  )
+                ],
               ),
             ),
-            bottom: PreferredSize(
-              child: Text(_subTitle,
-                style: TextStyle(
-                    color: Colors.black
-                )),
-              preferredSize: Size.fromHeight(20),
-            ),
-            iconTheme: IconThemeData(
-              color: Colors.black
-            ),
-            centerTitle: true,
-            backgroundColor: Colors.white,
-
           ),
-          drawer: Drawer(
-
-          ),
-          body: Container(
-            child: FutureBuilder(
-              future: getData(),
-              builder: (context, AsyncSnapshot s){
-                  if(s.hasData){
-
-                    return ListView.builder(
-                        itemCount: s.data.length,
-                        itemBuilder: (context, i){
-                            return Card(
-                              child: ListTile(
-                                leading: CircleAvatar(
-                                  backgroundImage: AssetImage("images/${s.data[i]['image']}"), // no matter how big it is, it won't overflow
-                                ),
-                                trailing: Icon(
-                                   Icons.navigate_next
-
-                                ),
-                                title: Text(
-                                    s.data[i]['city_name']
-                                ),
-                                onTap: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context)=>new RTeams(data: s.data[i]))),
-                                subtitle: Text(
-                                    _bSubtitle
-                                ),
-                              ),
-                            );
-                        },
-
-                    );
-
-                  }else if(s.hasError) {
-                    return Text("${s.error}");
-                   // return Center(
-                    //  child: CircularProgressIndicator(),
-                    //);
-                  }
-                    else{
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-              },
-            ),
-          ),
-          ),
-        );
-
+        ),
+    );
   }
 }
