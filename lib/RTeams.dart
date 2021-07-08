@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:monrtl/main.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'contact.dart';
+import 'error.dart';
 
 
 class RTeams extends StatelessWidget {
@@ -60,15 +60,17 @@ class RTeams extends StatelessWidget {
         appBar: AppBar(
           title: Text(data['city_name'],
             style: TextStyle(
-                color: Colors.blueAccent
+                color: Colors.blueAccent,
+
             ),
           ),
           bottom: PreferredSize(
             child: Text(_subTitle,
                 style: TextStyle(
-                    color: Colors.black
+                    color: Colors.black,
+                    height: 3.0
                 )),
-            preferredSize: Size.fromHeight(20),
+            preferredSize: Size.fromHeight(30),
           ),
           iconTheme: IconThemeData(
               color: Colors.black
@@ -88,7 +90,7 @@ class RTeams extends StatelessWidget {
                 itemBuilder: (context, i){
                   return Card(
                     child: ListTile(
-                      leading: Icon(Icons.verified_user_sharp),
+                      leading: Icon(Icons.contacts_sharp),
 
                       title: Text(
                           s.data[i]['name']
@@ -105,16 +107,15 @@ class RTeams extends StatelessWidget {
 
             }else if(s.hasError) {
               return Center(
-                  child: TextButton(
+                  child: IconButton(
                     onPressed: (){
                       Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                              builder: (BuildContext context) => new MainApp()));
+                              builder: (BuildContext context) => new ErrorApp()));
                     },
-                    child: Text("အင်တာနက်ဆက်သွယ်မှုများကိုစစ်ဆေးပြီးပြန်လည်ကြိုးစားကြည့်ပါ",
-                      style: TextStyle(color: Colors.orange),
-                    ),
+                    icon: Icon(Icons.refresh_outlined),
+                    color: Colors.blueAccent,
                   )
               );
             }

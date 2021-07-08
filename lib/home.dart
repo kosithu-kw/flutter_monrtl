@@ -5,11 +5,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'main.dart';
+import 'error.dart';
 
 import 'RTeams.dart';
 
 void main()=>runApp(HomeApp());
-
 
 
 
@@ -36,6 +36,7 @@ class _AppState extends State<HomeApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: _title,
+      theme: ThemeData(fontFamily: 'uni'),
       home: Scaffold(
         appBar: AppBar(
 
@@ -48,9 +49,11 @@ class _AppState extends State<HomeApp> {
           bottom: PreferredSize(
             child: Text(_subTitle,
                 style: TextStyle(
-                    color: Colors.black
+                    color: Colors.black,
+                  height: 3.0
                 )),
-            preferredSize: Size.fromHeight(20),
+            preferredSize: Size.fromHeight(30),
+
           ),
           iconTheme: IconThemeData(
               color: Colors.black
@@ -60,7 +63,18 @@ class _AppState extends State<HomeApp> {
 
         ),
         drawer: Drawer(
-
+            child: ListView(
+              children: [
+                ListTile(
+                  title: Text("App Version"),
+                  subtitle: Text("1.0.0"),
+                  leading: Icon(Icons.settings_accessibility),
+                  onTap: (){
+                    Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> new HomeApp()));
+                  },
+                )
+              ],
+            ),
         ),
         body: Container(
           child: FutureBuilder(
@@ -95,16 +109,15 @@ class _AppState extends State<HomeApp> {
 
               }else if(s.hasError) {
                 return Center(
-                    child: TextButton(
+                    child: IconButton(
                       onPressed: (){
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (BuildContext context) => new MainApp()));
+                                builder: (BuildContext context) => new ErrorApp()));
                       },
-                      child: Text("အင်တာနက်ဆက်သွယ်မှုများကိုစစ်ဆေးပြီးပြန်လည်ကြိုးစားကြည့်ပါ",
-                        style: TextStyle(color: Colors.orange),
-                      ),
+                      icon: Icon(Icons.refresh_outlined),
+                      color: Colors.blueAccent,
                     )
                 );
                 // return Center(

@@ -1,21 +1,27 @@
+
+
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'home.dart';
+import 'error.dart';
 
 void main(){
   runApp(
     MaterialApp(
-      title: 'Named Routes Demo',
+      title: 'MON RTL ROUTES',
       // Start the app with the "/" named route. In this case, the app starts
       // on the FirstScreen widget.
+      theme: ThemeData(fontFamily: 'uni'),
       initialRoute: '/',
       routes: {
         // When navigating to the "/" route, build the FirstScreen widget.
         '/': (context) => MainApp(),
         // When navigating to the "/second" route, build the SecondScreen widget.
         '/home': (context) => HomeApp(),
+        '/error' : (context) => ErrorApp(),
       },
     ),
   );
@@ -35,21 +41,31 @@ class _AppState extends State<MainApp> {
   final String _mTitle="မွန်ပြည်နယ်";
   final String _subTitle="(၁၀) မြို့နယ်အတွင်းရှိ အရေးပေါ်ကယ်ဆယ်ရေးအဖွဲ့များ";
 
-  bool _isConnection=false;
 
+    checkConnection() async{
+      try {
+        final result = await InternetAddress.lookup('raw.githubusercontent.com');
+        if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+          Navigator.pushNamed(context, '/home');
+        }
+      } on SocketException catch (_) {
+        Navigator.pushNamed(context, '/error');
+      }
+    }
+
+    /*
 
    checkConnection() async{
     var res=await http.get(Uri.https('raw.githubusercontent.com', "kosithu-kw/flutter_mrtl_data/master/townships.json"));
     if(res.statusCode==200){
-     setState(() {
        Navigator.pushNamed(context, '/home');
-     });
 
-
-
+    }else{
+      print("Error");
     }
-    //print(res.statusCode);
   }
+
+     */
 
   @override
   void initState() {
