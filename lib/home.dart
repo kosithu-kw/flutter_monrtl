@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'main.dart';
 import 'error.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:share/share.dart';
+
 
 import 'RTeams.dart';
 
@@ -23,10 +26,12 @@ class HomeApp extends StatefulWidget {
 class _AppState extends State<HomeApp> {
 
   getData() async{
-    var res=await http.get(Uri.https('raw.githubusercontent.com', "kosithu-kw/flutter_mrtl_data/master/townships.json"));
-    var jsonData=jsonDecode(res.body);
+    var result=await DefaultCacheManager().getSingleFile("https://raw.githubusercontent.com/kosithu-kw/flutter_mrtl_data/master/townships.json");
+    var file=await result.readAsString();
+    var jsonData=jsonDecode(file);
     return jsonData;
   }
+
 
   final String _title="မွန်ပြည်နယ်";
   final String _subTitle="(၁၀) မြို့နယ်အတွင်းရှိ အရေးပေါ်ကယ်ဆယ်ရေးအဖွဲ့များ";
@@ -72,7 +77,14 @@ class _AppState extends State<HomeApp> {
                   onTap: (){
                     Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> new HomeApp()));
                   },
-                )
+                ),
+                ListTile(
+                  title: Text("Share App"),
+                  leading: Icon(Icons.share),
+                  onTap: (){
+                    Share.share("https://play.google.com/store/apps/details?id=com.goldenmawlamyine.monrtl");
+                  },
+                ),
               ],
             ),
         ),

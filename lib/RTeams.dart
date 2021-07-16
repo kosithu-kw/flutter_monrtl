@@ -8,6 +8,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:monrtl/main.dart';
 import 'contact.dart';
 import 'error.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+
 
 
 class RTeams extends StatelessWidget {
@@ -22,7 +24,7 @@ class RTeams extends StatelessWidget {
 
   getData() async{
     var url;
-    var pUrl="kosithu-kw/flutter_mrtl_data/master/";
+    var pUrl="https://raw.githubusercontent.com/kosithu-kw/flutter_mrtl_data/master/";
     if(this.data['id']=="1"){
         url="${pUrl}mawlamyine.json";
     }else if(this.data['id']=="2"){
@@ -44,14 +46,12 @@ class RTeams extends StatelessWidget {
     }else{
       url="${pUrl}kyaikmayaw.json";
     }
-    var res=await http.get(Uri.https('raw.githubusercontent.com', url));
-    var jsonData=jsonDecode(res.body);
+    var result=await DefaultCacheManager().getSingleFile(url);
+    var file=await result.readAsString();
+    var jsonData=jsonDecode(file);
     return jsonData;
   }
 
-  void _showModal(){
-
-  }
 
   Widget build(BuildContext context) {
 
