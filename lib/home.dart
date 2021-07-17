@@ -25,13 +25,39 @@ class HomeApp extends StatefulWidget {
 
 class _AppState extends State<HomeApp> {
 
-  getData() async{
+
+  _getData() async{
+
     var result=await DefaultCacheManager().getSingleFile("https://raw.githubusercontent.com/kosithu-kw/flutter_mrtl_data/master/townships.json");
     var file=await result.readAsString();
     var jsonData=jsonDecode(file);
     return jsonData;
+
+
   }
 
+  bool _isUpdate=false;
+
+  _updateData() async{
+   await DefaultCacheManager().emptyCache().then((value){
+     setState(() {
+       _isUpdate=true;
+
+     });
+     Timer(Duration(seconds: 5), () {
+       setState(() {
+          _isUpdate=false;
+       });
+     });
+   });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+      //DefaultCacheManager().emptyCache();
+    super.initState();
+  }
 
   final String _title="မွန်ပြည်နယ်";
   final String _subTitle="(၁၀) မြို့နယ်အတွင်းရှိ အရေးပေါ်ကယ်ဆယ်ရေးအဖွဲ့များ";
@@ -44,7 +70,13 @@ class _AppState extends State<HomeApp> {
       theme: ThemeData(fontFamily: 'uni'),
       home: Scaffold(
         appBar: AppBar(
-
+          actions: [
+            IconButton(onPressed: (){
+                _updateData();
+            },
+                icon: Icon(Icons.cloud_download),
+            ),
+          ],
           title: Text(_title,
             style: TextStyle(
                 color: Colors.blueAccent
@@ -90,8 +122,25 @@ class _AppState extends State<HomeApp> {
         ),
         body: Container(
           child: FutureBuilder(
-            future: getData(),
+            future: _isUpdate ? _getData() : _getData(),
             builder: (context, AsyncSnapshot s){
+              if(_isUpdate)
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(left: 120, right: 120),
+                        child: LinearProgressIndicator(),
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(top: 20),
+                        child: Text("Updating data from server..."),
+                      )
+                    ],
+                  ),
+                );
               if(s.hasData){
 
                 return ListView.builder(
