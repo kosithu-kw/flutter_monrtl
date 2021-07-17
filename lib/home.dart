@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'main.dart';
 import 'error.dart';
@@ -21,6 +22,9 @@ class HomeApp extends StatefulWidget {
 
   @override
   _AppState createState() => _AppState();
+
+
+
 }
 
 class _AppState extends State<HomeApp> {
@@ -32,10 +36,17 @@ class _AppState extends State<HomeApp> {
     return jsonData;
   }
 
+  void test() async{
+    DefaultCacheManager().emptyCache();
+  var old=DefaultCacheManager().getFileFromCache("https://raw.githubusercontent.com/kosithu-kw/flutter_mrtl_data/master/townships.json");
+    var file=await old.asStream();
+    print(file);
+  }
 
   final String _title="မွန်ပြည်နယ်";
   final String _subTitle="(၁၀) မြို့နယ်အတွင်းရှိ အရေးပေါ်ကယ်ဆယ်ရေးအဖွဲ့များ";
   final String _bSubtitle="မြို့နယ်အတွင်းရှိ အရေးပေါ်ကယ်ဆယ်ရေးအဖွဲ့များ";
+
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +55,14 @@ class _AppState extends State<HomeApp> {
       theme: ThemeData(fontFamily: 'uni'),
       home: Scaffold(
         appBar: AppBar(
-
+          actions: [
+            IconButton(
+                onPressed: (){
+                  test();
+                },
+                icon: Icon(Icons.update)
+            )
+          ],
           title: Text(_title,
             style: TextStyle(
                 color: Colors.blueAccent
@@ -149,3 +167,23 @@ class _AppState extends State<HomeApp> {
 
   }
 }
+
+
+class UploadCacheMemoryData extends StatelessWidget {
+  const UploadCacheMemoryData({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<FileResponse>(
+        stream: fileStream,
+        builder: (_, s){
+
+        }
+    );
+  }
+}
+
+
+late Stream<FileResponse> fileStream = DefaultCacheManager().getFileStream(url);
+late Future<FileInfo?> fileInfoFuture = DefaultCacheManager().getFileFromCache(url);
+const url = 'https://raw.githubusercontent.com/kosithu-kw/flutter_mrtl_data/master/townships.json';
