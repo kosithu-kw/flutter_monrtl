@@ -3,8 +3,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
+import 'package:page_transition/page_transition.dart';
 import 'main.dart';
 import 'error.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -22,46 +22,73 @@ class HomeApp extends StatefulWidget {
 
   @override
   _AppState createState() => _AppState();
-
-
-
 }
 
 class _AppState extends State<HomeApp> {
 
-  getData() async{
+
+  _getData() async{
+
     var result=await DefaultCacheManager().getSingleFile("https://raw.githubusercontent.com/kosithu-kw/flutter_mrtl_data/master/townships.json");
     var file=await result.readAsString();
     var jsonData=jsonDecode(file);
     return jsonData;
+
+
   }
 
-  void test() async{
-    DefaultCacheManager().emptyCache();
-  var old=DefaultCacheManager().getFileFromCache("https://raw.githubusercontent.com/kosithu-kw/flutter_mrtl_data/master/townships.json");
-    var file=await old.asStream();
-    print(file);
+  bool _isUpdate=false;
+
+  _updateData() async{
+   await DefaultCacheManager().emptyCache().then((value){
+     setState(() {
+       _isUpdate=true;
+
+     });
+     Timer(Duration(seconds: 5), () {
+       setState(() {
+          _isUpdate=false;
+       });
+     });
+   });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+      //DefaultCacheManager().emptyCache();
+    super.initState();
   }
 
   final String _title="မွန်ပြည်နယ်";
   final String _subTitle="(၁၀) မြို့နယ်အတွင်းရှိ အရေးပေါ်ကယ်ဆယ်ရေးအဖွဲ့များ";
   final String _bSubtitle="မြို့နယ်အတွင်းရှိ အရေးပေါ်ကယ်ဆယ်ရေးအဖွဲ့များ";
 
+  int eClick=0;
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return WillPopScope(
+      onWillPop: ()async{
+        setState(() {
+          eClick++;
+        });
+        if(eClick >= 2){
+          return await exit(0);
+        }
+        return false;
+      },
+      child: MaterialApp(
       title: _title,
       theme: ThemeData(fontFamily: 'uni'),
       home: Scaffold(
         appBar: AppBar(
           actions: [
-            IconButton(
-                onPressed: (){
-                  test();
-                },
-                icon: Icon(Icons.update)
-            )
+            IconButton(onPressed: (){
+                _updateData();
+            },
+                icon: Icon(Icons.cloud_download),
+            ),
           ],
           title: Text(_title,
             style: TextStyle(
@@ -92,9 +119,7 @@ class _AppState extends State<HomeApp> {
                   title: Text("App Version"),
                   subtitle: Text("1.0.0"),
                   leading: Icon(Icons.settings_accessibility),
-                  onTap: (){
-                    Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> new HomeApp()));
-                  },
+
                 ),
                 ListTile(
                   title: Text("Share App"),
@@ -108,8 +133,25 @@ class _AppState extends State<HomeApp> {
         ),
         body: Container(
           child: FutureBuilder(
-            future: getData(),
+            future: _isUpdate ? _getData() : _getData(),
             builder: (context, AsyncSnapshot s){
+              if(_isUpdate)
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(left: 120, right: 120),
+                        child: LinearProgressIndicator(),
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(top: 20),
+                        child: Text("Updating data from server..."),
+                      )
+                    ],
+                  ),
+                );
               if(s.hasData){
 
                 return ListView.builder(
@@ -127,8 +169,9 @@ class _AppState extends State<HomeApp> {
                         title: Text(
                             s.data[i]['city_name']
                         ),
-                        onTap: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context)=>new RTeams(data: s.data[i]))),
-                        subtitle: Text(
+                        onTap: ()=> Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: RTeams(data:s.data[i]))),
+
+                          subtitle: Text(
                             _bSubtitle
                         ),
                       ),
@@ -163,27 +206,8 @@ class _AppState extends State<HomeApp> {
           ),
         ),
       ),
+      )
     );
 
   }
 }
-
-
-class UploadCacheMemoryData extends StatelessWidget {
-  const UploadCacheMemoryData({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<FileResponse>(
-        stream: fileStream,
-        builder: (_, s){
-
-        }
-    );
-  }
-}
-
-
-late Stream<FileResponse> fileStream = DefaultCacheManager().getFileStream(url);
-late Future<FileInfo?> fileInfoFuture = DefaultCacheManager().getFileFromCache(url);
-const url = 'https://raw.githubusercontent.com/kosithu-kw/flutter_mrtl_data/master/townships.json';
