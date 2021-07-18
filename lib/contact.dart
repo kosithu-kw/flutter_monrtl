@@ -5,7 +5,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'home.dart';
 import 'main.dart';
 
 
@@ -69,6 +71,14 @@ class Contact extends StatelessWidget {
         backgroundColor: Colors.white,
         centerTitle: true,
 
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){
+
+            Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: HomeApp()));
+
+        },
+        child: Icon(Icons.home),
       ),
       body: Container(
         child: ListView(

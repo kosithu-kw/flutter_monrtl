@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:page_transition/page_transition.dart';
 import 'main.dart';
 import 'error.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -63,9 +64,21 @@ class _AppState extends State<HomeApp> {
   final String _subTitle="(၁၀) မြို့နယ်အတွင်းရှိ အရေးပေါ်ကယ်ဆယ်ရေးအဖွဲ့များ";
   final String _bSubtitle="မြို့နယ်အတွင်းရှိ အရေးပေါ်ကယ်ဆယ်ရေးအဖွဲ့များ";
 
+  int eClick=0;
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return WillPopScope(
+      onWillPop: ()async{
+        setState(() {
+          eClick++;
+        });
+        if(eClick >= 2){
+          return await exit(0);
+        }
+        return false;
+      },
+      child: MaterialApp(
       title: _title,
       theme: ThemeData(fontFamily: 'uni'),
       home: Scaffold(
@@ -106,9 +119,7 @@ class _AppState extends State<HomeApp> {
                   title: Text("App Version"),
                   subtitle: Text("1.0.0"),
                   leading: Icon(Icons.settings_accessibility),
-                  onTap: (){
-                    Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context)=> new HomeApp()));
-                  },
+
                 ),
                 ListTile(
                   title: Text("Share App"),
@@ -158,8 +169,9 @@ class _AppState extends State<HomeApp> {
                         title: Text(
                             s.data[i]['city_name']
                         ),
-                        onTap: ()=>Navigator.of(context).push(MaterialPageRoute(builder: (context)=>new RTeams(data: s.data[i]))),
-                        subtitle: Text(
+                        onTap: ()=> Navigator.push(context, PageTransition(type: PageTransitionType.rightToLeft, child: RTeams(data:s.data[i]))),
+
+                          subtitle: Text(
                             _bSubtitle
                         ),
                       ),
@@ -194,6 +206,7 @@ class _AppState extends State<HomeApp> {
           ),
         ),
       ),
+      )
     );
 
   }
